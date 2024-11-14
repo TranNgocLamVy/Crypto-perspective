@@ -1,12 +1,11 @@
 "use client";
-
 import Container from "@/src/components/Container";
-import SignUpForm from "@/src/views/Authentication/SignupForm";
+import SignInForm from "@/src/views/Authentication/SigninForm";
 
-export default function Page() {
+export default function SignInPage() {
   return (
     <Container className="bg-[#DCF0FF] items-center justify-center">
-      <SignUpForm />
+      <SignInForm />
     </Container>
   );
 }
