@@ -1,4 +1,5 @@
 "use client";
+import Logo from "@/src/components/Logo";
 import {
   Navbar,
   NavbarBrand,
@@ -6,27 +7,20 @@ import {
   NavbarItem,
   Button,
 } from "@nextui-org/react";
-import Image from "next/image";
 import Link from "next/link";
 
 export default function PrivateNavbar() {
   return (
     <Navbar maxWidth="full" className="bg-[#DCF0FF]">
       <NavbarBrand>
-        <Image
-          src="/logo.png"
-          alt="logo"
-          width={200}
-          height={200}
-          className="w-32 cursor-pointer rounded-xl"
-        />
+        <Logo className="w-32" />
       </NavbarBrand>
       <NavbarContent justify="end">
         <NavbarItem className="hidden lg:flex">
           <Button
             as={Link}
             color="primary"
-            href="#"
+            href="/signin"
             variant="flat"
             radius="sm"
             className="font-bold">
@@ -37,7 +31,7 @@ export default function PrivateNavbar() {
           <Button
             as={Link}
             color="primary"
-            href="#"
+            href="/signup"
             variant="solid"
             radius="sm"
             className="text-white bg-primary-500 font-bold">
