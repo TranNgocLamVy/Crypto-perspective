@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import {
   BasicUserInfo,
   ChangeEmailPayload,
@@ -12,11 +12,8 @@ import {
   SignupPayload,
 } from "../types/user";
 
-const BackEndBaseURL = "https://dath.hcmutssps.id.vn";
-const basicHeader = {
-  withCredentials: true,
-  "Content-Type": "application/json",
-};
+export const BackEndBaseURL = "https://dath.hcmutssps.id.vn";
+
 const headerWithToken = (token: string) => {
   return {
     withCredentials: true,
@@ -24,13 +21,43 @@ const headerWithToken = (token: string) => {
     Cookie: `token=${token}`,
   };
 };
-const streamHeader = {};
-const headers = basicHeader;
+const headers = {
+  withCredentials: true,
+  "Content-Type": "application/json",
+};
+
+function processResponseFromAPIRoute(response: AxiosResponse<any, any>) {
+  return {
+    success: response.status === 200,
+    message: response.data.message,
+    data: response.data.data,
+    status: response.status,
+  } as CustomResponse<null>;
+}
+
+function processResponseFromAPIServer(error: any) {
+  return {
+    success: false,
+    message: error.response.data.message,
+    data: null,
+    status: error.status,
+  } as CustomResponse<null>;
+}
+
+function processError(error: any) {
+  return {
+    success: false,
+    message: error.response.data.message,
+    data: null,
+    status: error.status,
+  } as CustomResponse<null>;
+}
 
 // Auth Operation
 export class AuthOperation {
   constructor() {}
 
+  // Call from client
   public async signinWithEmail(payload: SigninWithEmailPayload) {
     const url = `${BackEndBaseURL}/auth/loginWithEmail`;
     try {
@@ -43,20 +70,15 @@ export class AuthOperation {
       } as CustomResponse<null>;
     } catch (error: any) {
       console.log(error);
-      return {
-        success: false,
-        message: error.response.data.message,
-        data: null,
-        status: error.status,
-      } as CustomResponse<null>;
+      return processError(error);
     }
   }
 
+  // Call from client
   public async signinWithUsername(payload: SigninWithUsernamePayload) {
     const url = `${BackEndBaseURL}/auth/login`;
     try {
       const response = await axios.put(url, payload, { headers: headers });
-      console.log(response);
       return {
         success: response.status === 200,
         message: response.data.message,
@@ -65,36 +87,23 @@ export class AuthOperation {
       } as CustomResponse<null>;
     } catch (error: any) {
       console.log(error);
-      return {
-        success: false,
-        message: error.response.data.message,
-        data: null,
-        status: error.status,
-      } as CustomResponse<null>;
+      return processError(error);
     }
   }
 
+  // Call from server
   public async signup(payload: SignupPayload) {
-    const url = `${BackEndBaseURL}/auth/register`;
+    const url = `/api/auth/register`;
     try {
       const response = await axios.post(url, payload, { headers: headers });
-      return {
-        success: response.status === 200,
-        message: response.data.message,
-        data: null,
-        status: response.status,
-      } as CustomResponse<null>;
+      return processResponseFromAPIRoute(response);
     } catch (error: any) {
       console.log(error);
-      return {
-        success: false,
-        message: error.response.data.message,
-        data: null,
-        status: error.status,
-      } as CustomResponse<null>;
+      return processError(error);
     }
   }
 
+  // Call from client
   public async signout() {
     const url = `${BackEndBaseURL}/auth/logOut`;
     try {
@@ -107,15 +116,11 @@ export class AuthOperation {
       } as CustomResponse<null>;
     } catch (error: any) {
       console.log(error);
-      return {
-        success: false,
-        message: error.response.data.message,
-        data: null,
-        status: error.status,
-      } as CustomResponse<null>;
+      return processError(error);
     }
   }
 
+  // Call from client
   public async refreshToken() {
     const url = `${BackEndBaseURL}/auth/refreshToken`;
     try {
@@ -128,57 +133,31 @@ export class AuthOperation {
       } as CustomResponse<null>;
     } catch (error: any) {
       console.log(error);
-      return {
-        success: false,
-        message: error.response.data.message,
-        data: null,
-        status: error.status,
-      } as CustomResponse<null>;
+      return processError(error);
     }
   }
 
+  // Call from server
   public async forgotPassword(payload: ForgotPasswordPayload) {
-    const url = `${BackEndBaseURL}/auth/forgotPassword?email=${payload.email}`;
+    const url = `/api/auth/forgotPassword`;
     try {
-      const response = await axios.get(url, { headers: headers });
-      return {
-        success: response.status === 200,
-        message: response.data.message,
-        data: null,
-        status: response.status,
-      } as CustomResponse<null>;
+      const response = await axios.post(url, payload, { headers: headers });
+      return processResponseFromAPIRoute(response);
     } catch (error: any) {
       console.log(error);
-      return {
-        success: false,
-        message: error.response.data.message,
-        data: null,
-        status: error.status,
-      } as CustomResponse<null>;
+      return processError(error);
     }
   }
 
+  // Call from server
   public async resetPassword(payload: ResetPasswordPayload) {
-    const url = `${BackEndBaseURL}/auth/resetPassword?email=${payload.email}&otpCode=${payload.otp}`;
-    const Newpayload = {
-      newPassword: payload.newPassword,
-    };
+    const url = `/api/auth/resetPassword`;
     try {
-      const response = await axios.put(url, Newpayload, { headers: headers });
-      return {
-        success: response.status === 200,
-        message: response.data.message,
-        data: null,
-        status: response.status,
-      } as CustomResponse<null>;
+      const response = await axios.post(url, payload, { headers: headers });
+      return processResponseFromAPIRoute(response);
     } catch (error: any) {
       console.log(error);
-      return {
-        success: false,
-        message: error.response.data.message,
-        data: null,
-        status: error.status,
-      } as CustomResponse<null>;
+      return processError(error);
     }
   }
 }
@@ -187,27 +166,7 @@ export class AuthOperation {
 export class UserOperation {
   constructor() {}
 
-  public async getUserInfo() {
-    const url = `${BackEndBaseURL}/api/info`;
-    try {
-      const response = await axios.get(url, { headers: headers });
-      return {
-        success: response.status === 200,
-        message: response.data.message,
-        data: response.data,
-        status: response.status,
-      } as CustomResponse<null>;
-    } catch (error: any) {
-      console.log(error);
-      return {
-        success: false,
-        message: error.response.data.message,
-        data: null,
-        status: error.status,
-      } as CustomResponse<null>;
-    }
-  }
-
+  // Call from server component
   public async getUserInfoFromServer(token: string) {
     const url = `${BackEndBaseURL}/api/info`;
     try {
@@ -216,102 +175,59 @@ export class UserOperation {
       });
       return {
         success: response.status === 200,
-        message: response.data.message,
+        message: "Get user info successfully",
         data: response.data,
         status: response.status,
-      } as CustomResponse<BasicUserInfo>;
+      } as CustomResponse<null>;
     } catch (error: any) {
       console.log(error);
-      return {
-        success: false,
-        message: error.response.data.message,
-        data: null,
-        status: error.status,
-      } as CustomResponse<null>;
+      return processError(error);
     }
   }
 
+  // Call from server
   public async changePassword(payload: ChangePasswordPayload) {
-    const url = `${BackEndBaseURL}/api/changePassword`;
+    const url = `/api/user/changePassword`;
     try {
-      const response = await axios.put(url, payload, { headers: headers });
-      return {
-        success: response.status === 200,
-        message: response.data.message,
-        data: null,
-        status: response.status,
-      } as CustomResponse<null>;
+      const response = await axios.post(url, payload, { headers: headers });
+      return processResponseFromAPIRoute(response);
     } catch (error: any) {
       console.log(error);
-      return {
-        success: false,
-        message: error.response.data.message,
-        data: null,
-        status: error.status,
-      } as CustomResponse<null>;
+      return processError(error);
     }
   }
 
+  // Call from server
   public async changeEmail(payload: ChangeEmailPayload) {
-    const url = `${BackEndBaseURL}/api/changeEmail?email=${payload.email}`;
+    const url = `/api/user/changeEmail`;
     try {
-      const response = await axios.put(url, { headers: headers });
-      return {
-        success: response.status === 200,
-        message: response.data.message,
-        data: null,
-        status: response.status,
-      } as CustomResponse<null>;
+      const response = await axios.post(url, payload, { headers: headers });
+      return processResponseFromAPIRoute(response);
     } catch (error: any) {
       console.log(error);
-      return {
-        success: false,
-        message: error.response.data.message,
-        data: null,
-        status: error.status,
-      } as CustomResponse<null>;
+      return processError(error);
     }
   }
 
   public async depositCoin(payload: DepositCoinPayload) {
-    const url = `${BackEndBaseURL}/api/deposit?amount=${payload.amount}`;
+    const url = `/api/user/depositCoin`;
     try {
-      const response = await axios.put(url, { headers: headers });
-      return {
-        success: response.status === 200,
-        message: response.data.message,
-        data: null,
-        status: response.status,
-      } as CustomResponse<null>;
+      const response = await axios.post(url, payload, { headers: headers });
+      return processResponseFromAPIRoute(response);
     } catch (error: any) {
       console.log(error);
-      return {
-        success: false,
-        message: error.response.data.message,
-        data: null,
-        status: error.status,
-      } as CustomResponse<null>;
+      return processError(error);
     }
   }
 
   public async purchaseVIP(payload: PurchaseVIPPayload) {
-    const url = `${BackEndBaseURL}/api/purchaseVIP?vipLevel=${payload.vipLevel}`;
+    const url = `/api/user/purchaseVIP`;
     try {
-      const response = await axios.put(url, { headers: headers });
-      return {
-        success: response.status === 200,
-        message: response.data.message,
-        data: null,
-        status: response.status,
-      } as CustomResponse<null>;
+      const response = await axios.post(url, payload, { headers: headers });
+      return processResponseFromAPIRoute(response);
     } catch (error: any) {
       console.log(error);
-      return {
-        success: false,
-        message: error.response.data.message,
-        data: null,
-        status: error.status,
-      } as CustomResponse<null>;
+      return processError(error);
     }
   }
 }

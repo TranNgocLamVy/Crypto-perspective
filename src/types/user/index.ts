@@ -5,7 +5,12 @@ export enum Role {
   VIP3 = 3,
 }
 
-export type User = {
+//Admin controller
+export type removeUserPayload = {
+  username: string;
+};
+
+export type DetailUserInfo = {
   name: string;
   email: string;
   username: string;
@@ -21,21 +26,32 @@ export type User = {
   telegram_id: string;
 };
 
-//Info
-type VIPROLE = { vipRole: Role };
-export type BasicUserInfo = Pick<User, "name" | "email" | "username" | "coin"> &
-  VIPROLE;
-
 //Auth
-export type SignupPayload = Pick<
-  User,
-  "name" | "email" | "username" | "password"
->;
-export type SigninWithEmailPayload = Pick<User, "email" | "password">;
-export type SigninWithUsernamePayload = Pick<User, "username" | "password">;
+export type SignupPayload = {
+  name: string;
+  username: string;
+  email: string;
+  password: string;
+};
 
-//User controller
-export type ForgotPasswordPayload = Pick<User, "email">;
+export type SigninWithEmailPayload = {
+  email: string;
+  password: string;
+};
+export type SigninWithUsernamePayload = {
+  username: string;
+  password: string;
+};
+
+//User
+export type BasicUserInfo = {
+  name: string;
+  username: string;
+  email: string;
+  vipRole: number;
+  coin: number | null;
+};
+export type ForgotPasswordPayload = { email: string };
 export type ResetPasswordPayload = {
   email: string;
   otp: string;
@@ -53,6 +69,3 @@ export type DepositCoinPayload = {
 export type PurchaseVIPPayload = {
   vipLevel: Role;
 };
-
-//Admin controller
-export type removeUserPayload = Pick<User, "username">;

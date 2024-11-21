@@ -3,18 +3,21 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import AuthProvider from "@/src/provider/AuthProvider";
 import { UserOperation } from "@/src/libs";
+import { cookies } from "next/headers";
 
 export const metadata: Metadata = {
   title: "Coin price",
   description: "A web to view crypto price",
 };
 
-const token =
-  "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJNSyIsInN1YiI6InRlc3QiLCJwYXNzd29yZCI6ImFpIGNobyBjb2kgbeG6rXQga2jhuql1IiwiZXhwIjoxNzMxNjAxNjQ3fQ.PmEb6ncosc8hv2M-kwkTuQw7MVpqHm8HC6kF184pW9A";
-
 async function getUserInfo() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token");
   const user = new UserOperation();
-  const res = await user.getUserInfoFromServer(token);
+  if (!token) {
+    return null;
+  }
+  const res = await user.getUserInfoFromServer(token.value);
   const data = res.data;
   if (res.success && data) {
     return data;

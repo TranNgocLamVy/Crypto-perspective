@@ -38,6 +38,9 @@ export default function IndicatorForm() {
         <SelectItem key={"email"} value={"email"}>
           Email
         </SelectItem>
+        <SelectItem key={"telegram"} value={"telegram"}>
+          Telegram
+        </SelectItem>
       </Select>
       <div className="w-full flex items-center justify-end">
         <Button radius="sm" className="bg-primary-500 text-white font-bold">
